@@ -9,9 +9,9 @@ class Archer:
         self.num_arrows = num_arrows
 
     def take_hit(self) -> None:
-        self.health -= 1
         if self.health <= 0:
             raise Exception(f"{self.name} is dead")
+        self.health -= 1
 
     def shoot(self, target: "Archer") -> None:
         if self.num_arrows <= 0:
