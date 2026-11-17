@@ -6,6 +6,16 @@ class Wizard:
         self.mana = self.__intelligence * 10
         self.health = self.__stamina * 100
 
+
+    def cast_fireball(self, target: "Wizard", fireball_cost: int, fireball_damage: int) -> None:
+        if fireball_cost > self.mana:
+            raise Exception(f"{self.name} cannot cast fireball")
+        self.mana -= fireball_cost
+        target.get_fireballed(fireball_damage)
+
+    def is_alive(self) -> bool:
+        return self.health > 0
+
     def get_fireballed(self, fireball_damage: int) -> None:
         fireball_damage -= self.__stamina
         self.health -= fireball_damage
