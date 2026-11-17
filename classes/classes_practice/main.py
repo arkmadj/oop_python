@@ -6,7 +6,7 @@ class Book:
 class Library:
     def __init__(self, name: str) -> None:
         self.name = name
-        self.books = []
+        self.books: list[Book] = []
 
     def add_book(self, book: Book) -> None:
         self.books.append(book)
