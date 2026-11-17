@@ -2,58 +2,60 @@ import pytest
 from main import Human
 
 run_cases = [
-    (0, 0, 5, "left", -5, 0),
-    (0, 0, 5, "right", 5, 0),
-    (0, 0, 5, "up", 0, 5),
+    ((0, 0, 5, 3), ["sprint_right"], (10, 0, None)),
+    (
+        (0, 0, 20, 3),
+        [
+            "sprint_left",
+            "sprint_left",
+            "sprint_left",
+        ],
+        (-120, 0, None),
+    ),
+    (
+        (1, 1, 3, 1),
+        ["sprint_down", "sprint_right"],
+        (1, -5, "not enough stamina to sprint"),
+    ),
 ]
 
 submit_cases = [
-    pytest.param(0, 0, 5, "down", 0, -5, marks=pytest.mark.submit),
-    pytest.param(10, 10, 2, "left", 8, 10, marks=pytest.mark.submit),
-    pytest.param(10, 10, 2, "right", 12, 10, marks=pytest.mark.submit),
-    pytest.param(10, 10, 2, "up", 10, 12, marks=pytest.mark.submit),
-    pytest.param(10, 10, 2, "down", 10, 8, marks=pytest.mark.submit),
+    pytest.param(
+        (1, 1, 5, 2),
+        ["sprint_left", "sprint_up", "sprint_down"],
+        (-9, 11, "not enough stamina to sprint"),
+        marks=pytest.mark.submit,
+    ),
 ]
 
 
 @pytest.mark.parametrize(
-    (
-        "pos_x",
-        "pos_y",
-        "speed",
-        "move_direction",
-        "expected_output_x",
-        "expected_output_y",
-    ),
-    run_cases + submit_cases,
+    ("human_args", "methods", "expected_output"), run_cases + submit_cases
 )
-def test_human_movement(
-    pos_x,
-    pos_y,
-    speed,
-    move_direction,
-    expected_output_x,
-    expected_output_y,
-):
+def test_sprint(human_args, methods, expected_output):
     print("\n---------------------------------")
-    print("Inputs:")
-    print(f" * pos_x: {pos_x}")
-    print(f" * pos_y: {pos_y}")
-    print(f" * speed: {speed}")
-    print(f" * move_direction: {move_direction}")
-    expected_output = (expected_output_x, expected_output_y)
-    human = Human(pos_x, pos_y, speed)
-    if move_direction == "left":
-        human.move_left()
-    elif move_direction == "right":
-        human.move_right()
-    elif move_direction == "up":
-        human.move_up()
-    elif move_direction == "down":
-        human.move_down()
-    result = human.get_position()
-    print(f"Expected x: {expected_output_x}")
-    print(f"Actual   x: {result[0]}")
-    print(f"Expected y: {expected_output_y}")
-    print(f"Actual   y: {result[1]}")
-    assert result == expected_output
+    print("Starting values:")
+    human = Human(*human_args)
+    print(f" * x: {human_args[0]}")
+    print(f" * y: {human_args[1]}")
+    print(f" * speed: {human_args[2]}")
+    print(f" * stamina: {human_args[3]}")
+    for method in methods:
+        print(f" - calling {method}...")
+    try:
+        for method in methods:
+            getattr(human, method)()
+        actual_x, actual_y = human.get_position()
+        actual_err = None
+    except Exception as error:
+        actual_x, actual_y = human.get_position()
+        actual_err = str(error)
+    expected_x, expected_y, expected_error = expected_output
+    print(f"Expected x: {expected_x}")
+    print(f"Actual   x: {actual_x}")
+    print(f"Expected y: {expected_y}")
+    print(f"Actual   y: {actual_y}")
+    print(f"Expected error: {expected_error}")
+    print(f"Actual   error: {actual_err}")
+    assert (actual_x, actual_y, actual_err) == expected_output
+
