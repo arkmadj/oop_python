@@ -1,52 +1,76 @@
 import pytest
 
-from main import Card
+from main import Card, HighCardRound, LowCardRound
 
 run_cases = [
-    ("Ace", "Hearts", "Queen", "Hearts", False, True),
-    ("2", "Spades", "2", "Hearts", True, False),
+    (Card("Ace", "Spades"), Card("2", "Clubs"), 1, 2),
+    (Card("Queen", "Hearts"), Card("Queen", "Diamonds"), 0, 0),
 ]
 
 submit_cases = [
     pytest.param(
-        "Ace", "Spades", "Ace", "Spades", True, False, marks=pytest.mark.submit
-    ),
-    pytest.param("3", "Diamonds", "7", "Clubs", False, False, marks=pytest.mark.submit),
-    pytest.param(
-        "King", "Clubs", "King", "Hearts", True, False, marks=pytest.mark.submit
+        Card("10", "Clubs"), Card("9", "Spades"), 1, 2, marks=pytest.mark.submit
     ),
     pytest.param(
-        "Queen", "Diamonds", "Jack", "Spades", False, True, marks=pytest.mark.submit
+        Card("King", "Hearts"),
+        Card("Queen", "Spades"),
+        1,
+        2,
+        marks=pytest.mark.submit,
     ),
-    pytest.param("10", "Hearts", "10", "Hearts", True, False, marks=pytest.mark.submit),
     pytest.param(
-        "Jack", "Spades", "Queen", "Clubs", False, False, marks=pytest.mark.submit
+        Card("2", "Diamonds"),
+        Card("2", "Diamonds"),
+        0,
+        0,
+        marks=pytest.mark.submit,
     ),
-    pytest.param("10", "Clubs", "9", "Hearts", False, True, marks=pytest.mark.submit),
+    pytest.param(
+        Card("5", "Clubs"), Card("10", "Hearts"), 2, 1, marks=pytest.mark.submit
+    ),
+    pytest.param(
+        Card("Jack", "Spades"),
+        Card("2", "Spades"),
+        1,
+        2,
+        marks=pytest.mark.submit,
+    ),
 ]
 
 
+def result_to_card(card1, card2, placement):
+    if placement == 1:
+        return card1
+    if placement == 2:
+        return card2
+    return "Tie"
+
+
 @pytest.mark.parametrize(
-    ("rank_1", "suit_1", "rank_2", "suit_2", "expected_eq", "expected_gt"),
+    ("card1", "card2", "expected_high_winner", "expected_low_winner"),
     run_cases + submit_cases,
 )
-def test_card_comparison(rank_1, suit_1, rank_2, suit_2, expected_eq, expected_gt):
+def test_rounds(card1, card2, expected_high_winner, expected_low_winner):
     print("\n---------------------------------")
-    print(f"Inputs: {rank_1} of {suit_1}, {rank_2} of {suit_2}")
-    print("Expected:")
-    print(f" * Equal: {expected_eq}")
-    print(f" * Greater than: {expected_gt}")
-    print(f" * Less than: {not (expected_eq or expected_gt)}")
+    print("Inputs:")
+    print(f" * card1: {card1}")
+    print(f" * card2: {card2}")
 
-    card_1 = Card(rank_1, suit_1)
-    card_2 = Card(rank_2, suit_2)
-    result_eq = card_1 == card_2
-    result_gt = card_1 > card_2
-    result_lt = card_1 < card_2
-    print("Actual:")
-    print(f" * Equal: {result_eq}")
-    print(f" * Greater than: {result_gt}")
-    print(f" * Less than: {result_lt}")
-    assert result_eq == expected_eq
-    assert result_gt == expected_gt
-    assert result_lt == (not (expected_eq or expected_gt))
+    print("\nTesting HighCardRound:")
+    high_round = HighCardRound(card1, card2)
+    high_result = high_round.resolve_round()
+    expected_winner = result_to_card(card1, card2, expected_high_winner)
+    actual_winner = result_to_card(card1, card2, high_result)
+    print(f"Expected winner: {expected_winner}")
+    print(f"Actual winner:   {actual_winner}")
+
+    print("\nTesting LowCardRound:")
+    low_round = LowCardRound(card1, card2)
+    low_result = low_round.resolve_round()
+    expected_winner = result_to_card(card1, card2, expected_low_winner)
+    actual_winner = result_to_card(card1, card2, low_result)
+    print(f"Expected winner: {expected_winner}")
+    print(f"Actual winner:   {actual_winner}")
+
+    assert high_result == expected_high_winner
+    assert low_result == expected_low_winner

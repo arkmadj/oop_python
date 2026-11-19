@@ -22,6 +22,11 @@ class Card:
     suit: str
     rank_index: int
 
+    def __init__(self, rank: str, suit: str) -> None:
+        self.rank = rank
+        self.suit = suit
+        self.rank_index = RANKS.index(rank)
+
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, Card):
             return False
@@ -33,10 +38,40 @@ class Card:
     def __lt__(self, other: "Card") -> bool:
         return self.rank_index < other.rank_index
 
-    def __init__(self, rank: str, suit: str) -> None:
-        self.rank = rank
-        self.suit = suit
-        self.rank_index = RANKS.index(rank)
-
     def __str__(self) -> str:
         return f"{self.rank} of {self.suit}"
+
+
+class Round:
+    def resolve_round(self) -> int:
+        raise NotImplementedError("Subclasses must implement resolve_round()")
+
+
+class HighCardRound(Round):
+    def __init__(self, card1: Card, card2: Card) -> None:
+        super().__init__()
+        self.card1 = card1
+        self.card2 = card2
+
+    def resolve_round(self) -> int:
+        if self.card1 > self.card2:
+            return 1
+        elif self.card1 < self.card2:
+            return 2
+        else:
+            return 0
+
+
+class LowCardRound(Round):
+    def __init__(self, card1: Card, card2: Card) -> None:
+        super().__init__()
+        self.card1 = card1
+        self.card2 = card2
+
+    def resolve_round(self) -> int:
+        if self.card1 < self.card2:
+            return 1
+        elif self.card1 > self.card2:
+            return 2
+        else:
+            return 0
