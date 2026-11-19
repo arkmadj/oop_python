@@ -1,64 +1,39 @@
 import pytest
 
-from main import Rectangle
+from main import Dragon
 
 run_cases = [
-    (Rectangle(0, 0, 4, 4), Rectangle(3, 3, 6, 6), True),
-    (Rectangle(0, 0, 4, 4), Rectangle(5, 5, 8, 8), False),
+    (Dragon("Green Dragon", -1, -2, 1, 2, 1), -2, -3, 0, 0, True),
+    (Dragon("Red Dragon", 2, 2, 2, 2, 2), 0, 1, 1, 0, True),
+    (Dragon("Gold Dragon", 0, 0, 5, 5, 10), 4, 0, 5, 1, False),
+    (Dragon("Blue Dragon", 4, -3, 2, 1, 1), 0, 0, 10, 10, False),
 ]
 
 submit_cases = [
     pytest.param(
-        Rectangle(0, 0, 1, 1),
-        Rectangle(4, 4, 5, 5),
-        False,
-        marks=pytest.mark.submit,
-    ),
-    pytest.param(
-        Rectangle(1, 1, 4, 4),
-        Rectangle(2, 2, 3, 3),
+        Dragon("Orange Dragon", 0, 0, 20, 20, 20),
+        10,
+        10,
+        20,
+        20,
         True,
         marks=pytest.mark.submit,
     ),
     pytest.param(
-        Rectangle(1, 1, 2, 2),
-        Rectangle(0, 0, 4, 4),
+        Dragon("Black Dragon", 5, -1, 3, 2, 2),
+        -10,
+        -10,
+        10,
+        10,
         True,
         marks=pytest.mark.submit,
     ),
     pytest.param(
-        Rectangle(1, 1, 4, 4),
-        Rectangle(1, 1, 4, 4),
-        True,
-        marks=pytest.mark.submit,
-    ),
-    pytest.param(
-        Rectangle(0, 0, 4, 1),
-        Rectangle(1, 2, 3, 3),
-        False,
-        marks=pytest.mark.submit,
-    ),
-    pytest.param(
-        Rectangle(0, 0, 4, 4),
-        Rectangle(5, 0, 8, 4),
-        False,
-        marks=pytest.mark.submit,
-    ),
-    pytest.param(
-        Rectangle(10, 0, 14, 4),
-        Rectangle(0, 0, 4, 4),
-        False,
-        marks=pytest.mark.submit,
-    ),
-    pytest.param(
-        Rectangle(0, 0, 2, 2),
-        Rectangle(2, 0, 4, 2),
-        True,
-        marks=pytest.mark.submit,
-    ),
-    pytest.param(
-        Rectangle(0, 0, 2, 2),
-        Rectangle(2, 2, 4, 4),
+        Dragon("Tall Dragon", 0, 0, 10, 2, 1),
+        0,
+        4,
+        1,
+        5,
         True,
         marks=pytest.mark.submit,
     ),
@@ -66,16 +41,22 @@ submit_cases = [
 
 
 @pytest.mark.parametrize(
-    ("rect1", "rect2", "expected_overlap"), run_cases + submit_cases
+    ("dragon", "x1", "y1", "x2", "y2", "expected_output"),
+    run_cases + submit_cases,
 )
-def test_overlap(rect1, rect2, expected_overlap):
+def test_in_area(dragon, x1, y1, x2, y2, expected_output):
     print("\n---------------------------------")
-    print("Checking overlap of:")
-    print(f" - {rect1}")
-    print(f" - {rect2}")
+    print(f" * Dragon pos_x: {dragon.pos_x}")
+    print(f" * Dragon pos_y: {dragon.pos_y}")
+    print(f" * Dragon height: {dragon.height}")
+    print(f" * Dragon width: {dragon.width}")
     print()
-    print(f"Expected overlap: {expected_overlap}")
-
-    result = rect1.overlaps(rect2)
-    print(f"Actual overlap:   {result}")
-    assert result == expected_overlap
+    print(f" * Area x1: {x1}")
+    print(f" * Area y1: {y1}")
+    print(f" * Area x2: {x2}")
+    print(f" * Area y2: {y2}")
+    print()
+    result = dragon.in_area(x1, y1, x2, y2)
+    print(f"Expected in area: {expected_output}")
+    print(f"Actual in area:   {result}")
+    assert result == expected_output
